@@ -1,0 +1,2 @@
+-d test/resources/a --list
+-d test/resources/a --read

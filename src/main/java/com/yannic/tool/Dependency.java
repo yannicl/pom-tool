@@ -1,5 +1,8 @@
 package com.yannic.tool;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * Created by yannic on 20/10/17.
  */
@@ -8,6 +11,8 @@ public class Dependency implements Comparable<Dependency> {
     String groupId = null;
     String artefactId = null;
     String version = null;
+
+    String location;
 
     public String getGroupId() {
         return groupId;
@@ -43,6 +48,30 @@ public class Dependency implements Comparable<Dependency> {
 
     public int compareTo(Dependency o) {
         return toString().compareTo(o.toString());
+    }
+
+    public boolean isSnapshot() {
+        return version.endsWith("SNAPSHOT");
+    }
+
+    public String getArtefactName() {
+        return groupId + ":" + artefactId;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public void setLocation(File location) {
+        try {
+            this.location = location.getCanonicalPath();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
