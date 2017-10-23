@@ -9,13 +9,38 @@ public class DependencyAnalyser {
 
     private final static Logger log = Logger.getLogger(DependencyAnalyser.class.getName());
 
-    public void analyse(DependencyRepository projectRepo, DependencyRepository dependencies) {
+    public void analyse(DependencyRepository projectRepo, DependencyRepository dependencies, DependencyRepository ref) {
         if (projectRepo.size() == 0) {
             log.warning("No project to analyze");
             return;
         }
         analyzeProjetRepo(projectRepo);
         analyzeDependencies(projectRepo, dependencies);
+        if (ref.size() == 0) {
+            log.warning("Skipping dependency check with reference list");
+            return;
+        }
+        analyseDependenciesWithRef(projectRepo, dependencies, ref);
+    }
+
+    private void analyseDependenciesWithRef(DependencyRepository projectRepo, DependencyRepository dependencies, DependencyRepository ref) {
+        /**
+         * Les versions de la liste de référence doivent être utilisées
+         */
+        boolean isSnapshotBundle = projectRepo.first().isSnapshot();
+        String versionBundle = projectRepo.first().getVersion();
+        if (isSnapshotBundle) {
+            for (Dependency dependency : dependencies) {
+                if (!dependency.isSnapshot()) {
+                    if (ref.containsArtefact(dependency.getArtefactName())) {
+                        Dependency r = ref.getArtefact(dependency.getArtefactName());
+                        if (!r.getVersion().equals(dependency.getVersion())) {
+                            log.severe("Unexpected dependency found " + dependency.toString() + " at " + dependency.getLocation() +  ". Version does not match reference");
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void analyzeProjetRepo(DependencyRepository projectRepo) {

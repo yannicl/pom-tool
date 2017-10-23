@@ -13,8 +13,11 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 public class PomReader extends DefaultHandler {
+
+    private final static Logger log = Logger.getLogger(PomReader.class.getName());
 
     boolean isGroupId = false;
     boolean isArtefactId = false;
@@ -179,6 +182,7 @@ public class PomReader extends DefaultHandler {
     public void readAllFiles(Collection<File> files) throws ParserConfigurationException, SAXException, IOException {
         SAXParserFactory factory = SAXParserFactory.newInstance();
         SAXParser saxParser = factory.newSAXParser();
+        log.info(files.size() + " files to read");
         for(File file: files) {
             this.setCurrentFile(file);
             saxParser.parse(file, this);

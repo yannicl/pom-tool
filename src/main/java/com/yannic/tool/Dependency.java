@@ -2,6 +2,7 @@ package com.yannic.tool;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * Created by yannic on 20/10/17.
@@ -51,7 +52,7 @@ public class Dependency implements Comparable<Dependency> {
     }
 
     public boolean isSnapshot() {
-        return version.endsWith("SNAPSHOT");
+        return version != null && version.endsWith("SNAPSHOT");
     }
 
     public String getArtefactName() {
@@ -72,6 +73,18 @@ public class Dependency implements Comparable<Dependency> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Dependency createFromString(String s) {
+        String[] t = s.split(":");
+        if (t.length != 3) {
+            throw new IllegalArgumentException("illegal expression to represent a dependency: " + s);
+        }
+        Dependency d = new Dependency();
+        d.setGroupId(t[0]);
+        d.setArtefactId(t[1]);
+        d.setVersion(t[2]);
+        return d;
     }
 
 }

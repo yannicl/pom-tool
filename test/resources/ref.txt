@@ -1,0 +1,1 @@
+io.appium:java-client:5.0.0-BETA8

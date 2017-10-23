@@ -1,7 +1,11 @@
 package com.yannic.tool;
 
-import java.util.Set;
-import java.util.TreeSet;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -44,6 +48,14 @@ public class DependencyRepository extends TreeSet<Dependency> {
             log.severe("Must be a unique artefact: " + dependency);
         }
         register(dependency);
+    }
+
+    public void registerAllFromList(File listFile) throws IOException {
+        List<String> list = FileUtils.readLines(listFile, Charset.defaultCharset());
+        for (String s : list) {
+            Dependency d = Dependency.createFromString(s);
+            this.registerUnique(d);
+        }
     }
 
 

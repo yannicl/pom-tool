@@ -21,6 +21,7 @@ public class Main {
     PomFinder pomFinder = new PomFinder();
     PomReader pomReader = new PomReader();
     DependencyAnalyser analyser = new DependencyAnalyser();
+    DependencyRepository ref = new DependencyRepository();
 
     public Main() {
 
@@ -42,13 +43,17 @@ public class Main {
         dir.setRequired(true);
         Option list = new Option( "l", "list", false, "list all poms" );
         Option files = new Option( "f", "files", true, "file containing the list of all poms" );
-        Option read = new Option( "r", "read", false, "read all poms" );
+        Option analyze = new Option( "a", "analyze", false, "analyze all poms" );
+        Option create = new Option( "c", "create-ref", false, "create reference list" );
+        Option load = new Option( "r", "load-ref", true, "load reference list" );
 
         options.addOption(help);
         options.addOption(dir);
         options.addOption(list);
         options.addOption(files);
-        options.addOption(read);
+        options.addOption(load);
+        options.addOption(create);
+        options.addOption(analyze);
 
 
         try {
@@ -76,9 +81,18 @@ public class Main {
                 main.pomFinder.findAllPom(dirFile);
             }
 
-            if (cmd.hasOption("read")) {
+            if (cmd.hasOption("load-ref")) {
+                main.ref.registerAllFromList(new File(cmd.getOptionValue("load-ref")));
+            }
+
+            if (cmd.hasOption("analyze")) {
                 main.pomReader.readAllFiles(main.pomFinder.getCollection());
-                main.analyser.analyse(main.pomReader.getProjectRepository(), main.pomReader.getRepository());
+                main.analyser.analyse(main.pomReader.getProjectRepository(), main.pomReader.getRepository(), main.ref);
+            }
+
+            if (cmd.hasOption("create-ref")) {
+                main.pomReader.readAllFiles(main.pomFinder.getCollection());
+                main.pomReader.printProjectRepo();
             }
 
 

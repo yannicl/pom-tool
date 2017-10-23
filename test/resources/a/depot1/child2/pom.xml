@@ -21,7 +21,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <version>5.0.0-BETA9</version>
+            <version>5.0.0-BETA8</version>
             <groupId>io.appium</groupId>
             <artifactId>java-client</artifactId>
         </dependency>
