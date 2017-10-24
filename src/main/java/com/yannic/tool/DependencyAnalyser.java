@@ -59,6 +59,24 @@ public class DependencyAnalyser {
                         Dependency r = ref.getArtefact(dependency.getArtefactName());
                         if (!r.getVersion().equals(dependency.getVersion())) {
                             log.severe("Unexpected dependency found " + dependency.toString() + " at " + dependency.getLocation() +  ". Version does not match reference");
+                            log.info("Migration: " + dependency.toString() + "->" + r.getVersion());
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
+         * Dans un bundle snapshot, vérifie si une dependence avec le snapshot du bundle pointerait vers un non disponible en snapshot mais connu dans la liste de référence
+         */
+        if (isSnapshotBundle) {
+            for(Dependency dependency: dependencies) {
+                if (dependency.getVersion() != null && dependency.getVersion().equals(versionBundle)) {
+                    if (!projectRepo.containsArtefact(dependency.getArtefactName())) {
+                        Dependency r = ref.getArtefact(dependency.getArtefactName());
+                        if (r != null) {
+                            log.severe("Unexpected dependency found " + dependency.toString() + " at " + dependency.getLocation() +  ". Version is not correct. This project is closed.");
+                            log.info("Migration: " + dependency.toString() + "->" + r.getVersion());
                         }
                     }
                 }
@@ -76,6 +94,7 @@ public class DependencyAnalyser {
             if (project.getVersion() != null && project.isSnapshot() != isSnapshotBundle) {
                 if (isSnapshotBundle) {
                     log.severe("Snapshot bundle contains a non snapshot project: " + project + " at " + project.getLocation());
+                    log.info("Migration: " + project.toString() + "->" + versionBundle);
                 } else {
                     log.severe("Reference bundle contains a snapshot project: " + project + " at " + project.getLocation());
                 }
@@ -86,6 +105,7 @@ public class DependencyAnalyser {
             if (isSnapshotBundle) {
                 if (project.isSnapshot() && (!project.getVersion().equals(versionBundle))) {
                     log.severe("Project has not the correct snapshot version: " + project + " at " + project.getLocation() + ". Version should be " + versionBundle);
+                    log.info("Migration: " + project.toString() + "->" + versionBundle);
                 }
             }
         }
@@ -103,6 +123,7 @@ public class DependencyAnalyser {
                 if (projectRepo.containsArtefact(artefactName)) {
                     if ((dependency.getVersion() != null) && (!dependency.getVersion().equals(projectRepo.getArtefact(artefactName).getVersion()))) {
                         log.severe("Unexpected dependency found " + dependency.toString() + " at " + dependency.getLocation() + ". Version is not correct. This project is opened with version " + projectRepo.getArtefact(artefactName).getVersion());
+                        log.info("Migration: " + dependency.toString() + "->" + projectRepo.getArtefact(artefactName).getVersion());
                     }
                 }
             }

@@ -1,1 +1,2 @@
 io.appium:java-client:5.0.0-BETA8
+a.depot1:child1:1.2.1

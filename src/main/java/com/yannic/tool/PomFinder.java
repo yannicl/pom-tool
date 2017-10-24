@@ -23,7 +23,7 @@ public class PomFinder {
         Collection<File> files = FileUtils.listFiles(
                 dir,
                 new RegexFileFilter("pom.xml"),
-                FileFilterUtils.makeDirectoryOnly(HiddenFileFilter.VISIBLE)
+                FileFilterUtils.and(FileFilterUtils.makeDirectoryOnly(HiddenFileFilter.VISIBLE), FileFilterUtils.notFileFilter(FileFilterUtils.nameFileFilter("target")))
         );
         this.collection = files;
         return files;
