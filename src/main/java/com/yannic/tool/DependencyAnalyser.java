@@ -1,5 +1,7 @@
 package com.yannic.tool;
 
+import com.sun.deploy.util.StringUtils;
+
 import java.util.logging.Logger;
 
 /**
@@ -14,6 +16,9 @@ public class DependencyAnalyser {
             log.warning("No project to analyze");
             return;
         }
+        precheckDependencies(projectRepo);
+        precheckDependencies(dependencies);
+        precheckDependencies(ref);
         analyzeProjetRepo(projectRepo);
         analyzeDependencies(projectRepo, dependencies);
         if (ref.size() == 0) {
@@ -21,6 +26,24 @@ public class DependencyAnalyser {
             return;
         }
         analyseDependenciesWithRef(projectRepo, dependencies, ref);
+    }
+
+    private void precheckDependencies(DependencyRepository repository) {
+        for (Dependency dependency : repository) {
+            precheckLabels(dependency);
+        }
+    }
+
+    private void precheckLabels(Dependency dependency) {
+        if (!StringUtils.trimWhitespace(dependency.getGroupId()).equals(dependency.getGroupId())) {
+            log.severe("Illegal groupId [" + StringUtils.trimWhitespace(dependency.getGroupId()) + "] at " + dependency.getLocation() +  ".");
+        }
+        if (!StringUtils.trimWhitespace(dependency.getArtefactId()).equals(dependency.getArtefactId())) {
+            log.severe("Illegal artefactId [" + StringUtils.trimWhitespace(dependency.getArtefactId()) + "] at " + dependency.getLocation() +  ".");
+        }
+        if (dependency.getVersion() != null && !StringUtils.trimWhitespace(dependency.getVersion()).equals(dependency.getVersion())) {
+            log.severe("Illegal version [" + StringUtils.trimWhitespace(dependency.getVersion()) + "] at " + dependency.getLocation() +  ".");
+        }
     }
 
     private void analyseDependenciesWithRef(DependencyRepository projectRepo, DependencyRepository dependencies, DependencyRepository ref) {
@@ -50,7 +73,7 @@ public class DependencyAnalyser {
             /**
              * Tous les projets sont en snapshot ou aucun ne l'est mais pas un mix des deux.
              */
-            if (project.isSnapshot() != isSnapshotBundle) {
+            if (project.getVersion() != null && project.isSnapshot() != isSnapshotBundle) {
                 if (isSnapshotBundle) {
                     log.severe("Snapshot bundle contains a non snapshot project: " + project + " at " + project.getLocation());
                 } else {
