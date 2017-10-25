@@ -28,22 +28,26 @@ public class DependencyAnalyser {
         analyseDependenciesWithRef(projectRepo, dependencies, ref);
     }
 
-    private void precheckDependencies(DependencyRepository repository) {
+    protected void precheckDependencies(DependencyRepository repository) {
         for (Dependency dependency : repository) {
             precheckLabels(dependency);
         }
     }
 
-    private void precheckLabels(Dependency dependency) {
-        if (!StringUtils.trimWhitespace(dependency.getGroupId()).equals(dependency.getGroupId())) {
-            log.severe("Illegal groupId [" + StringUtils.trimWhitespace(dependency.getGroupId()) + "] at " + dependency.getLocation() +  ".");
+    protected void precheckLabels(Dependency dependency) {
+        if (isIllegalLabel(dependency.getGroupId())) {
+            log.severe("Illegal groupId [" + dependency.getGroupId() + "] at " + dependency.getLocation() +  ".");
         }
-        if (!StringUtils.trimWhitespace(dependency.getArtefactId()).equals(dependency.getArtefactId())) {
-            log.severe("Illegal artefactId [" + StringUtils.trimWhitespace(dependency.getArtefactId()) + "] at " + dependency.getLocation() +  ".");
+        if (isIllegalLabel(dependency.getArtefactId())) {
+            log.severe("Illegal artefactId [" + dependency.getArtefactId() + "] at " + dependency.getLocation() +  ".");
         }
-        if (dependency.getVersion() != null && !StringUtils.trimWhitespace(dependency.getVersion()).equals(dependency.getVersion())) {
-            log.severe("Illegal version [" + StringUtils.trimWhitespace(dependency.getVersion()) + "] at " + dependency.getLocation() +  ".");
+        if (dependency.getVersion() != null && isIllegalLabel(dependency.getVersion())) {
+            log.severe("Illegal version [" + dependency.getVersion() + "] at " + dependency.getLocation() +  ".");
         }
+    }
+
+    protected boolean isIllegalLabel(String label) {
+        return (!label.replaceAll("[\\n\\t\\s]", "").equals(label));
     }
 
     private void analyseDependenciesWithRef(DependencyRepository projectRepo, DependencyRepository dependencies, DependencyRepository ref) {

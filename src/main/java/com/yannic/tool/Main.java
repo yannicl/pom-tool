@@ -46,6 +46,7 @@ public class Main {
         Option analyze = new Option( "a", "analyze", false, "analyze all poms" );
         Option create = new Option( "c", "create-ref", false, "create reference list" );
         Option load = new Option( "r", "load-ref", true, "load reference list" );
+        Option print = new Option( "v", "print", false, "print all lists" );
 
         options.addOption(help);
         options.addOption(dir);
@@ -54,6 +55,7 @@ public class Main {
         options.addOption(load);
         options.addOption(create);
         options.addOption(analyze);
+        options.addOption(print);
 
 
         try {
@@ -93,6 +95,11 @@ public class Main {
             if (cmd.hasOption("create-ref")) {
                 main.pomReader.readAllFiles(main.pomFinder.getCollection());
                 main.pomReader.printProjectRepo();
+            }
+
+            if (cmd.hasOption("print")) {
+                main.pomReader.printProjectRepo();
+                main.pomReader.printRepo();
             }
 
 

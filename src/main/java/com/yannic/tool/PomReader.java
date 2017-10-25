@@ -27,6 +27,10 @@ public class PomReader extends DefaultHandler {
     boolean isProjectArtefactId = false;
     boolean isProjectVersion = false;
 
+    boolean isParentGroupId = false;
+    boolean isParentArtefactId = false;
+    boolean isParentVersion = false;
+
     File currentFile;
 
     public File getCurrentFile() {
@@ -39,16 +43,26 @@ public class PomReader extends DefaultHandler {
 
     Dependency dependency;
     Dependency project;
+    Dependency parent;
     DependencyRepository repository = new DependencyRepository();
     DependencyRepository projectRepository = new DependencyRepository();
 
     public void resetState() {
         isGroupId = false; isArtefactId = false; isVersion = false;
         isProjectGroupId = false; isProjectArtefactId = false; isProjectVersion = false;
+        isParentGroupId = false; isParentArtefactId = false; isParentVersion = false;
     }
 
     public void endProject() {
         if (project != null) {
+            if (parent != null) {
+                if (project.getGroupId() == null) {
+                    project.setGroupId(parent.getGroupId());
+                }
+                if (project.getVersion() == null) {
+                    project.setVersion(parent.getVersion());
+                }
+            }
             projectRepository.registerUnique(project);
             project = null;
         }
@@ -68,8 +82,8 @@ public class PomReader extends DefaultHandler {
 
         if (qName.equalsIgnoreCase("parent")) {
             resetState();
-            dependency = new Dependency();
-            dependency.setLocation(currentFile);
+            parent = new Dependency();
+            parent.setLocation(currentFile);
         }
 
         if (qName.equalsIgnoreCase("project")) {
@@ -93,6 +107,8 @@ public class PomReader extends DefaultHandler {
                 isGroupId = true;
             } else if (project != null) {
                 isProjectGroupId = true;
+            } else if (parent != null) {
+                isParentGroupId = true;
             }
         }
 
@@ -101,6 +117,8 @@ public class PomReader extends DefaultHandler {
                 isArtefactId = true;
             } else if (project != null) {
                 isProjectArtefactId = true;
+            } else if (parent != null) {
+                isParentArtefactId = true;
             }
         }
 
@@ -109,6 +127,8 @@ public class PomReader extends DefaultHandler {
                 isVersion = true;
             } else if (project != null) {
                 isProjectVersion = true;
+            } else if (parent != null) {
+                isParentVersion = true;
             }
         }
 
@@ -126,8 +146,7 @@ public class PomReader extends DefaultHandler {
         }
 
         if (qName.equalsIgnoreCase("parent")) {
-            repository.register(dependency);
-            dependency = null;
+            repository.register(parent);
         }
 
         if (qName.equalsIgnoreCase("project")) {
@@ -175,6 +194,21 @@ public class PomReader extends DefaultHandler {
         if (isProjectVersion) {
             project.setVersion(new String(ch, start, length));
             isProjectVersion = false;
+        }
+
+        if (isParentGroupId) {
+            parent.setGroupId(new String(ch, start, length));
+            isParentGroupId = false;
+        }
+
+        if (isParentArtefactId) {
+            parent.setArtefactId(new String(ch, start, length));
+            isParentArtefactId = false;
+        }
+
+        if (isParentVersion) {
+            parent.setVersion(new String(ch, start, length));
+            isParentVersion = false;
         }
 
     }

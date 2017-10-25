@@ -1,2 +1,0 @@
-resources/pom.xml
-resources/child1/pom.xml
